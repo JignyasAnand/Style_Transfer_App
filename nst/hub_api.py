@@ -21,9 +21,9 @@ class HUB_NST:
     style_image = load_cropped_image(style_image, CONFIG.style_img_size, crop=True, fixed=True)
     content_image = load_cropped_image(content_image, CONFIG.content_img_size, crop=False, fixed=True)
     style_image = tf.nn.avg_pool(style_image, ksize=[3, 3], strides=[1, 1], padding='SAME')
-    show_n([style_image, content_image])
+    # show_n([style_image, content_image])
     outputs = self.hub_module(tf.constant(content_image), tf.constant(style_image))
-    return outputs[0]
+    return outputs[0][0]
 
 
 def crop_center(img):

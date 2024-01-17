@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, Response
 from PIL import Image
 from io import BytesIO
 import numpy as np
@@ -13,11 +13,13 @@ def image_to_numpy(data):
 
 
 @app.post("/")
-async def test_process(files: List[UploadFile]):
+async def process_and_return(files: List[UploadFile]):
     style_img = image_to_numpy(await files[0].read())
     content_img = image_to_numpy(await files[1].read())
     nst = HUB_NST()
     result = nst.get_stylized_image(style_img, content_img)
-    plt.imshow(result[0])
-    plt.show()
-    return {"Hello": len(files)}
+    buf = BytesIO()
+    image = Image.fromarray(np.uint8(result*255))
+    image.save(buf, format="PNG")
+    bytes = buf.getvalue()
+    return Response(content=bytes, media_type="image/png")
